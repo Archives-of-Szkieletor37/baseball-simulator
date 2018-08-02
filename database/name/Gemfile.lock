@@ -1,0 +1,17 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    gimei (0.3.0)
+      romaji
+    rake (12.3.1)
+    romaji (0.2.4)
+      rake (>= 0.8.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  gimei
+
+BUNDLED WITH
+   1.11.2

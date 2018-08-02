@@ -2,6 +2,7 @@
 #define _GAME_H_
 
 #include <bits/stdc++.h>
+#include "team.h"
 
 enum Result_at_a_Single_ball{
   HIT,
@@ -49,6 +50,8 @@ class AT_BAT;
 
 class GAME{
   private:
+    TEAM *Team1,*Team2;
+    std::pair<TEAM*, TEAM*> Teams;
     std::pair<int, Inning_Top_or_Bottom> Current_Inning_Number;
     std::pair<int,int> Score;
     int Current_At_Bat; // 現在打席の打順

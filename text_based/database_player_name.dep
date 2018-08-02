@@ -1,0 +1,1 @@
+database_player_name.o: database_player_name.cpp database_player_name.h

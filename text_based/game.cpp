@@ -1,6 +1,11 @@
 #include "game.h"
+#include "team.h"
 
 GAME::GAME() {
+  Team1 = new TEAM;
+  Team2 = new TEAM;
+  Teams.first = Team1;
+  Teams.second = Team2;
   Current_Inning_Number = std::pair<int, Inning_Top_or_Bottom>(1, TOP);
   Score = std::pair<int,int>(0,0);
   Current_At_Bat = 1;
@@ -8,9 +13,27 @@ GAME::GAME() {
 };
 
 GAME::~GAME(){
+  delete Team1;
+  delete Team2;
 };
 
 std::pair<int,int> GAME::Start_Game() {
+
+  Teams.first->Print_Team_Name();
+  std::cout << " vs "; 
+  Teams.second->Print_Team_Name();
+  std::cout << std::endl;
+
+  std::cout << "スターティングメンバーを紹介します" << std::endl;
+  std::cout << "先攻:";
+  Teams.first->Print_Team_Name();
+  std::cout << std::endl;
+  Teams.first->Print_Current_Players_on_the_Ground();
+
+  std::cout << "後攻:";
+  Teams.second->Print_Team_Name();
+  std::cout << std::endl;
+  Teams.second->Print_Current_Players_on_the_Ground();
 
   while(Game_Status != END) {
 

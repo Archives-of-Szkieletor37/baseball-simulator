@@ -4,14 +4,14 @@
 #include <bits/stdc++.h>
 #include "team.h"
 
-enum Result_at_a_Single_ball{
+enum ResultAtASingleBall{
   HIT,
   STRIKE, 
   FOUL,
   BALL,
 };
 
-enum Result_at_Bat{
+enum ResultAtBat{
   SINGLE_HIT,
   TWO_BASE_HIT,
   THREE_BASE_HIT,
@@ -21,12 +21,12 @@ enum Result_at_Bat{
   BATTED_BALL_OUT, //スリーバント失敗
 };
 
-enum Inning_Top_or_Bottom{
+enum InningTopOrBottom{
   TOP, //表
   BOTTOM, //裏
 };
 
-enum Status_Ongoing_or_End{
+enum GameStatus{
   ONGOING,
   END,
 };
@@ -45,60 +45,60 @@ struct Count {
   int Ball;
 };
 
-class INNING;
-class AT_BAT;
+class Inning;
+class AtBat;
 
-class GAME{
+class Game{
   private:
-    TEAM *Team1,*Team2;
-    std::pair<TEAM*, TEAM*> Teams;
-    std::pair<int, Inning_Top_or_Bottom> Current_Inning_Number;
+    Team *Team1,*Team2;
+    std::pair<Team*, Team*> Teams;
+    std::pair<int, InningTopOrBottom> currentInningNumber;
     std::pair<int,int> Score;
-    int Current_At_Bat; // 現在打席の打順
-    Status_Ongoing_or_End Game_Status; //true->試合中、false->終了
-    INNING *inning;
+    int numberOfCurrentAtBat; // 現在打席の打順
+    GameStatus gameStatus; //true->試合中、false->終了
+    Inning *inning;
 
   public:
-    GAME();
-    ~GAME();
+    Game();
+    ~Game();
 
-    void Update_Score(int);
-    void Print_Score();
-    std::pair<int,int> Start_Game();
-    void Succeed_Inning();
-    void Succeed_Current_At_Bat();
+    void updateScore(int);
+    void printScore();
+    std::pair<int,int> startGame();
+    void succeedInning();
+    void succeedCurrentAtBat();
 };
 
-class INNING{
+class Inning{
   private:
     int Outs;
-    Bases Bases_Status;
-    Status_Ongoing_or_End Inning_Status;
-    AT_BAT *at_bat;
+    Bases currentStatusofBases;
+    GameStatus inningStatus;
+    AtBat *currentAtBat;
 
   public:
-    INNING();
-    ~INNING();
+    Inning();
+    ~Inning();
 
-    void Start_Inning(GAME*);
-    void Succeed_Outs();
-    void Apply_the_Result_at_Bat(Result_at_Bat, GAME*);
+    void startInning(Game*);
+    void succeedOuts();
+    void applyTheResultAtBat(ResultAtBat, Game*);
 
   private:
-    void Change_Bases_Status(Result_at_Bat);
-    void Add_Score_by_the_Result_at_Bat(Result_at_Bat, GAME*);
+    void changeStatusOfBases(ResultAtBat);
+    void updateScoreByTheResultAtBut(ResultAtBat, Game*);
 };
 
-class AT_BAT{
+class AtBat{
   private:
-    Count Count_at_Bat;
-    //Result_at_Bat eval();
+    Count CurrentCountOfThisAtBat;
+    //ResultAtBat eval();
 
   public:
-    AT_BAT();
-    ~AT_BAT();
+    AtBat();
+    ~AtBat();
 
-    Result_at_Bat Start_At_Bat(GAME*, INNING*);
+    ResultAtBat startAtBat(Game*, Inning*);
 };
 
 #endif

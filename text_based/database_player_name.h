@@ -7,10 +7,10 @@
 using kanji = std::string;
 using hiragana = std::string;
 
-extern const std::vector<std::pair<kanji,hiragana>> database_lastname;
-extern const std::vector<std::pair<kanji,hiragana>> database_firstname;
+extern const std::vector<std::pair<kanji,hiragana>> DATABASE_LASTNAME;
+extern const std::vector<std::pair<kanji,hiragana>> DATABASE_FIRSTNAME;
 
-extern std::pair<kanji,hiragana> get_firstname_fromdb(int);
-extern std::pair<kanji,hiragana> get_lastname_fromdb(int);
+extern std::pair<kanji,hiragana> getFirstNameFromDB(int);
+extern std::pair<kanji,hiragana> getLastNameFromDB(int);
 
 #endif

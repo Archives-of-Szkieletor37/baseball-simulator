@@ -14,56 +14,56 @@
 
 using Flag = bool;
 
-typedef struct PLAYER_Name{
-  int First_Name; //index of database
-  int Last_Name; //index of database
-}PLAYER_Name;
+typedef struct PlayerName{
+  int firstName; //index of database
+  int lastName; //index of database
+}PlayerName;
 
-typedef struct TEAM_Name{
+typedef struct TeamName{
   std::string Name;
   std::string Suffix;
-}TEAM_Name;
+}TeamName;
 
-enum Left_or_Right {
+enum leftOrRight {
   LEFT,
   RIGHT,
   SWITCH, //両打ち
 };
 
-enum TEAM_Class {
+enum TeamClass {
   Highschool,
   College,
   Npb,
 };
 
-class PLAYER;
-class TEAM{
+class Player;
+class Team{
   private:
-    TEAM_Class Team_Class; 
-    TEAM_Name Team_Name;
-    PLAYER* Players[NUM_OF_PLAYERS_ON_THE_BENCH];
-    PLAYER* Current_Players_on_the_Ground[9]; //出場中
+    TeamClass classOfThisTeam; 
+    TeamName nameOfThisTeam;
+    Player* Players[NUM_OF_PLAYERS_ON_THE_BENCH];
+    Player* currentHittersOrder[9]; //出場中
 
   public:
-    TEAM();
-    ~TEAM();
+    Team();
+    ~Team();
 
-    void Print_Team_Name();
-    void Print_Current_Players_on_the_Ground();
+    void printTeamName();
+    void printHittersCurrentlyAppeared();
 };
 
-class PLAYER{
+class Player{
   private:
-    TEAM* Team;
-    PLAYER_Name Player_Name; 
-    Left_or_Right Bats; //右打ち左打ち両打ち
-    Left_or_Right Throws; //右投げ左投げ
+    Team* theirTeam;
+    PlayerName thisPlayerName; 
+    leftOrRight Bats; //右打ち左打ち両打ち
+    leftOrRight Throws; //右投げ左投げ
 
   public:
-    PLAYER();
-    ~PLAYER();
+    Player();
+    ~Player();
 
-    void Print_Player_Name();
+    void printPlayerName();
     
 };
 

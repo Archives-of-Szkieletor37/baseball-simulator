@@ -1,23 +1,23 @@
-#include <bits/stdc++.h>
-#include "game.h"
+#include <iostream>
+
 #include "database_player_name.h"
+#include "game.h"
 
 int main() {
 
-  GAME *new_game;
+  Game *newGame;
 
   srand((unsigned int)time(NULL));
 
-  new_game = new GAME;
+  newGame = new Game;
 
-  std::pair<int,int> final_score;
-  final_score = new_game->Start_Game();
+  std::pair<int, int> finalScore;
+  finalScore = newGame->startGame();
 
-  std::cout << "The final score is\n" << final_score.first << " - " << final_score.second << std::endl;
+  std::cout << "The final score is\n"
+            << finalScore.first << " - " << finalScore.second << std::endl;
 
-  delete new_game;
+  delete newGame;
 
   return 0;
 }
-
-

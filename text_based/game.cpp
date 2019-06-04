@@ -1,52 +1,52 @@
 #include "game.h"
 #include "team.h"
 
-GAME::GAME() {
-  Team1 = new TEAM;
-  Team2 = new TEAM;
+Game::Game() {
+  Team1 = new Team;
+  Team2 = new Team;
   Teams.first = Team1;
   Teams.second = Team2;
-  Current_Inning_Number = std::pair<int, Inning_Top_or_Bottom>(1, TOP);
-  Score = std::pair<int,int>(0,0);
-  Current_At_Bat = 1;
-  Game_Status = ONGOING;
+  currentInningNumber = std::pair<int, InningTopOrBottom>(1, TOP);
+  Score = std::pair<int, int>(0, 0);
+  numberOfCurrentAtBat = 1;
+  gameStatus = ONGOING;
 };
 
-GAME::~GAME(){
+Game::~Game() {
   delete Team1;
   delete Team2;
 };
 
-std::pair<int,int> GAME::Start_Game() {
+std::pair<int, int> Game::startGame() {
 
-  Teams.first->Print_Team_Name();
-  std::cout << " vs "; 
-  Teams.second->Print_Team_Name();
+  Teams.first->printTeamName();
+  std::cout << " vs ";
+  Teams.second->printTeamName();
   std::cout << std::endl;
 
   std::cout << "スターティングメンバーを紹介します" << std::endl;
   std::cout << "先攻:";
-  Teams.first->Print_Team_Name();
+  Teams.first->printTeamName();
   std::cout << std::endl;
-  Teams.first->Print_Current_Players_on_the_Ground();
+  Teams.first->printHittersCurrentlyAppeared();
 
   std::cout << "後攻:";
-  Teams.second->Print_Team_Name();
+  Teams.second->printTeamName();
   std::cout << std::endl;
-  Teams.second->Print_Current_Players_on_the_Ground();
+  Teams.second->printHittersCurrentlyAppeared();
 
-  while(Game_Status != END) {
+  while (gameStatus != END) {
 
     std::cout << "The ";
-    if(Current_Inning_Number.second == TOP)
+    if (currentInningNumber.second == TOP)
       std::cout << "TOP";
     else
       std::cout << "BOTTOM";
-    std::cout << " of the " << Current_Inning_Number.first << std::endl;
+    std::cout << " of the " << currentInningNumber.first << std::endl;
 
-    inning = new INNING;
-    inning->Start_Inning(this);
-    Succeed_Inning();
+    inning = new Inning;
+    inning->startInning(this);
+    succeedInning();
 
     std::cout << "Change\n" << std::endl;
 
@@ -55,187 +55,189 @@ std::pair<int,int> GAME::Start_Game() {
   return Score;
 }
 
-void GAME::Update_Score(int add_score) { //スコアを変える関数
+void Game::updateScore(int scoreToAdd) { //スコアを変える関数
 
-  switch(Current_Inning_Number.second) {
-    case TOP: //表なら
-      Score.first += add_score; //先攻にプラスする
-      break;
-    case BOTTOM: //裏なら
-      Score.second += add_score; //後攻にプラスする
-      break;
+  switch (currentInningNumber.second) {
+  case TOP:                   //表なら
+    Score.first += scoreToAdd; //先攻にプラスする
+    break;
+  case BOTTOM:                 //裏なら
+    Score.second += scoreToAdd; //後攻にプラスする
+    break;
   }
 }
 
-void GAME::Print_Score() {
+void Game::printScore() {
 
-  std::cout << "Now score is " << Score.first << " - " << Score.second << std::endl;
+  std::cout << "Now score is " << Score.first << " - " << Score.second
+            << std::endl;
 }
 
-void GAME::Succeed_Inning() { //イニングを進める関数
-  if(Current_Inning_Number.first == 9 // 9回で 
-      && (Current_Inning_Number.second == BOTTOM //9回裏か
-	|| 
-	(Current_Inning_Number.second == TOP && Score.first < Score.second))) { //9回表終了で後攻がリードなら
-    Game_Status = END;// ゲーム終了処理
-  }
-  else {
-    switch(Current_Inning_Number.second) {
-      case TOP: // 表なら
-	Current_Inning_Number.second = BOTTOM; //裏にする
-	break;
-      case BOTTOM: // 裏なら
-	Current_Inning_Number.first++; //回をひとつ進める
-	Current_Inning_Number.second = TOP; //回を表にする
-	break;
+void Game::succeedInning() {          //イニングを進める関数
+  if (currentInningNumber.first == 9 // 9回で
+      && (currentInningNumber.second == BOTTOM // 9回裏か
+          || (currentInningNumber.second == TOP &&
+              Score.first < Score.second))) { // 9回表終了で後攻がリードなら
+    gameStatus = END;                        // ゲーム終了処理
+  } else {
+    switch (currentInningNumber.second) {
+    case TOP:                                // 表なら
+      currentInningNumber.second = BOTTOM; //裏にする
+      break;
+    case BOTTOM:                          // 裏なら
+      currentInningNumber.first++;      //回をひとつ進める
+      currentInningNumber.second = TOP; //回を表にする
+      break;
     }
   }
 }
 
-void GAME::Succeed_Current_At_Bat() { //打順を進める関数
-  if(Current_At_Bat == 9) //9番なら
-    Current_At_Bat = 1; //1番へ
+void Game::succeedCurrentAtBat() { //打順を進める関数
+  if (numberOfCurrentAtBat == 9)            // 9番なら
+    numberOfCurrentAtBat = 1;               // 1番へ
   else
-    Current_At_Bat++; //ひとつ進める
+    numberOfCurrentAtBat++; //ひとつ進める
 }
 
-INNING::INNING() { //イニングの初期状態
+Inning::Inning() { //イニングの初期状態
   Outs = 0;
-  for(int i=FIRST_BASE; i<=THIRD_BASE; i++)
-    Bases_Status[i] = false;
-  Inning_Status = ONGOING;
+  for (int i = FIRST_BASE; i <= THIRD_BASE; i++)
+    currentStatusofBases[i] = false;
+  inningStatus = ONGOING;
 }
 
-INNING::~INNING(){
-};
+Inning::~Inning(){};
 
-void INNING::Start_Inning(GAME *game) {
+void Inning::startInning(Game *game) {
 
-  Result_at_Bat result_at_bat;
+  ResultAtBat resultAtBat;
 
-  while(Inning_Status != END){
-    at_bat = new AT_BAT;
-    result_at_bat = at_bat->Start_At_Bat(game, this);
-    Apply_the_Result_at_Bat(result_at_bat, game); 
-    delete at_bat;
+  while (inningStatus != END) {
+    currentAtBat = new AtBat;
+    resultAtBat = currentAtBat->startAtBat(game, this);
+    applyTheResultAtBat(resultAtBat, game);
+    delete currentAtBat;
   }
 }
 
-void INNING::Succeed_Outs() {
+void Inning::succeedOuts() {
   ++Outs;
-  if(Outs == 3) {
-    Inning_Status = END;// 終了処理
+  if (Outs == 3) {
+    inningStatus = END; // 終了処理
   }
 }
 
-void INNING::Apply_the_Result_at_Bat(Result_at_Bat result_at_bat, GAME *game) {
-  switch(result_at_bat) {
-    case STRIKEOUT:
-    case BATTED_BALL_OUT:
-      Succeed_Outs();
-      break;
-    default:
-      game->Succeed_Current_At_Bat();
-      break;
+void Inning::applyTheResultAtBat(ResultAtBat resultAtBat, Game *game) {
+  switch (resultAtBat) {
+  case STRIKEOUT:
+  case BATTED_BALL_OUT:
+    succeedOuts();
+    break;
+  default:
+    game->succeedCurrentAtBat();
+    break;
   }
-  Add_Score_by_the_Result_at_Bat(result_at_bat, game);
-  Change_Bases_Status(result_at_bat);
-  game->Print_Score();
-  std::cout << Bases_Status[0] << " " << Bases_Status[1] << " " << Bases_Status[2] << std::endl;
+  updateScoreByTheResultAtBut(resultAtBat, game);
+  changeStatusOfBases(resultAtBat);
+  game->printScore();
+  std::cout << currentStatusofBases[0] << " " << currentStatusofBases[1] << " "
+            << currentStatusofBases[2] << std::endl;
 }
 
-void INNING::Change_Bases_Status(Result_at_Bat result_at_bat) {
-  int num_of_succeed_bases;
-  switch(result_at_bat) {
-    case SINGLE_HIT:
-      num_of_succeed_bases = 1;
-      std::cout << "Single Hit" << std::endl;
-      break;
-    case TWO_BASE_HIT:
-      num_of_succeed_bases = 2;
-      std::cout << "Two-Base Hit" << std::endl;
-      break;
-    case THREE_BASE_HIT:
-      std::cout << "Three-Base Hit" << std::endl;
-      num_of_succeed_bases = 3;
-      break;
-    case HOMERUN:
-      std::cout << "HOMERUN!" << std::endl;
-      num_of_succeed_bases = 4;
-      break;
-    case WALK:
-      std::cout << "Walk" << std::endl; // 四球のときのランナーの進み方に特殊な処理が必要(未実装）
-      num_of_succeed_bases = 1;
-      break;
-    case STRIKEOUT:
-      std::cout << "StrikeOut" << std::endl;
-      num_of_succeed_bases = 0;
-      break;
-    case BATTED_BALL_OUT:
-      std::cout << "Batted_Ball_Out" << std::endl;
-      num_of_succeed_bases = 0;
-      break;
+void Inning::changeStatusOfBases(ResultAtBat resultAtBat) {
+  int numberOfAdvanceOfBases;
+  switch (resultAtBat) {
+  case SINGLE_HIT:
+    numberOfAdvanceOfBases = 1;
+    std::cout << "Single Hit" << std::endl;
+    break;
+  case TWO_BASE_HIT:
+    numberOfAdvanceOfBases = 2;
+    std::cout << "Two-Base Hit" << std::endl;
+    break;
+  case THREE_BASE_HIT:
+    std::cout << "Three-Base Hit" << std::endl;
+    numberOfAdvanceOfBases = 3;
+    break;
+  case HOMERUN:
+    std::cout << "HOMERUN!" << std::endl;
+    numberOfAdvanceOfBases = 4;
+    break;
+  case WALK:
+    std::cout
+        << "Walk"
+        << std::endl; // 四球のときのランナーの進み方に特殊な処理が必要(未実装）
+    numberOfAdvanceOfBases = 1;
+    break;
+  case STRIKEOUT:
+    std::cout << "StrikeOut" << std::endl;
+    numberOfAdvanceOfBases = 0;
+    break;
+  case BATTED_BALL_OUT:
+    std::cout << "Batted_Ball_Out" << std::endl;
+    numberOfAdvanceOfBases = 0;
+    break;
   }
-  Bases New_Bases_Status = {false,false,false};
-  for(int i=FIRST_BASE; i<=THIRD_BASE; i++) { //既に塁上にいるランナーの処理
-    if(i + num_of_succeed_bases >= 3) {//本塁まで進む場合 
-      Bases_Status[i] = false; //塁からいなくなる 
+  Bases nextStatusOfBases = {false, false, false};
+  for (int i = FIRST_BASE; i <= THIRD_BASE;
+       i++) { //既に塁上にいるランナーの処理
+    if (i + numberOfAdvanceOfBases >= 3) { //本塁まで進む場合
+      currentStatusofBases[i] = false;           //塁からいなくなる
       continue;
-    }
-    else if(Bases_Status[i] == true)//それ以外で、ランナーがいる場合は
-      New_Bases_Status[i + num_of_succeed_bases] = Bases_Status[i];// num_of_succeed_bases だけ進む
+    } else if (currentStatusofBases[i] == true) //それ以外で、ランナーがいる場合は
+      nextStatusOfBases[i + numberOfAdvanceOfBases] =
+          currentStatusofBases[i]; // numberOfAdvanceOfBases だけ進む
   }
-  if(num_of_succeed_bases < 4 //打者の処理
-      && num_of_succeed_bases > 0) //ホームラン・アウト以外
-    New_Bases_Status[num_of_succeed_bases-1] = true; 
-  for(int i=FIRST_BASE; i<=THIRD_BASE; i++)
-    this->Bases_Status[i] = New_Bases_Status[i]; //配列コピー
+  if (numberOfAdvanceOfBases < 4     //打者の処理
+      && numberOfAdvanceOfBases > 0) //ホームラン・アウト以外
+    nextStatusOfBases[numberOfAdvanceOfBases - 1] = true;
+  for (int i = FIRST_BASE; i <= THIRD_BASE; i++)
+    this->currentStatusofBases[i] = nextStatusOfBases[i]; //配列コピー
 }
 
-void INNING::Add_Score_by_the_Result_at_Bat(Result_at_Bat result_at_bat, GAME *game) {
-  
-  int possible_base_runner_can_come_home_from=0; //帰ってこられる最大のランナーの数
-  int num_of_runners_come_home=0; //帰ってくるランナーの数
-  switch(result_at_bat) {
-    case SINGLE_HIT:
-      possible_base_runner_can_come_home_from=1;
-      break;
-    case TWO_BASE_HIT:
-      possible_base_runner_can_come_home_from=2;
-      break;
-    case THREE_BASE_HIT:
-      possible_base_runner_can_come_home_from=3;
-      break;
-    case HOMERUN:
-      possible_base_runner_can_come_home_from=3;
-      game->Update_Score(1);
-      break;
-    case WALK:
-      possible_base_runner_can_come_home_from=1;
-      break;
-    case BATTED_BALL_OUT:
-    case STRIKEOUT:
-      possible_base_runner_can_come_home_from=0;
-      break;
+void Inning::updateScoreByTheResultAtBut(ResultAtBat resultAtBat,
+                                            Game *game) {
+
+  int NumberOfRunnersPossibleToComeHomebase =
+      0; //帰ってこられる最大のランナーの数
+  int NumberOfRunnersComeHomebase = 0; //帰ってくるランナーの数
+  switch (resultAtBat) {
+  case SINGLE_HIT:
+    NumberOfRunnersPossibleToComeHomebase = 1;
+    break;
+  case TWO_BASE_HIT:
+    NumberOfRunnersPossibleToComeHomebase = 2;
+    break;
+  case THREE_BASE_HIT:
+    NumberOfRunnersPossibleToComeHomebase = 3;
+    break;
+  case HOMERUN:
+    NumberOfRunnersPossibleToComeHomebase = 3;
+    game->updateScore(1);
+    break;
+  case WALK:
+    NumberOfRunnersPossibleToComeHomebase = 1;
+    break;
+  case BATTED_BALL_OUT:
+  case STRIKEOUT:
+    NumberOfRunnersPossibleToComeHomebase = 0;
+    break;
   }
-  for(int i=3; i>3-possible_base_runner_can_come_home_from; i--) {
-    if(Bases_Status[i-1] == true)
-      num_of_runners_come_home++;
+  for (int i = 3; i > 3 - NumberOfRunnersPossibleToComeHomebase; i--) {
+    if (currentStatusofBases[i - 1] == true)
+      NumberOfRunnersComeHomebase++;
   }
-  if(num_of_runners_come_home > 0)
-    game->Update_Score(num_of_runners_come_home);
+  if (NumberOfRunnersComeHomebase > 0)
+    game->updateScore(NumberOfRunnersComeHomebase);
 }
 
-
-AT_BAT::AT_BAT() { //打席の初期状態
-  Count_at_Bat.Strike = 0;
-  Count_at_Bat.Ball = 0;
+AtBat::AtBat() { //打席の初期状態
+  CurrentCountOfThisAtBat.Strike = 0;
+  CurrentCountOfThisAtBat.Ball = 0;
 }
-AT_BAT::~AT_BAT(){
-};
+AtBat::~AtBat(){};
 
-Result_at_Bat AT_BAT::Start_At_Bat(GAME *game, INNING *inning) {
+ResultAtBat AtBat::startAtBat(Game *game, Inning *inning) {
 
-  return Result_at_Bat(rand() % 7);
-
+  return ResultAtBat(rand() % 7);
 }

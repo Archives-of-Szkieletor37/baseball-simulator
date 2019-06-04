@@ -31,14 +31,14 @@ enum GameStatus{
   END,
 };
 
-typedef struct Bases_ {
+struct Bases {
   bool& operator[](int i) {return bases[i];}
   bool bases[3];
-} Bases;
+};
 
-#define FIRST_BASE 0
-#define SECOND_BASE 1
-#define THIRD_BASE 2
+constexpr int FIRST_BASE = 0;
+constexpr int SECOND_BASE = 1;
+constexpr int THIRD_BASE = 2;
 
 struct Count {
   int Strike;

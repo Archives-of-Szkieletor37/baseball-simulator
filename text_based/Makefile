@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -Wall -g -std=c++11
+CXXFLAGS = -Wall -Wextra -g -std=c++11
 TARGET = baseball_simulator 
 SRCS := $(wildcard *.cpp)
 OBJS = $(SRCS:.cpp=.o)

@@ -10,19 +10,19 @@
  * 選手のクラスを作る。
  * メンバ->名前、右打ち左打ち両打ち、右投げ左投げ
  */
-#define NUM_OF_PLAYERS_ON_THE_BENCH 25
+constexpr int NUM_OF_PLAYERS_ON_THE_BENCH = 25;
 
 using Flag = bool;
 
-typedef struct PlayerName{
+struct PlayerName{
   int firstName; //index of database
   int lastName; //index of database
-}PlayerName;
+};
 
-typedef struct TeamName{
+struct TeamName{
   std::string Name;
   std::string Suffix;
-}TeamName;
+};
 
 enum leftOrRight {
   LEFT,

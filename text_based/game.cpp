@@ -94,7 +94,8 @@ void Game::succeedOuts() {
 void Game::applyTheResultAtBat(ResultAtBat resultAtBat) {
   switch (resultAtBat) {
   case STRIKEOUT:
-  case BATTED_BALL_OUT:
+  case GROUNDOUT:
+  case FLYOUT:
     succeedOuts();
     [[gnu::fallthrough]];
   default:
@@ -119,15 +120,15 @@ void Game::succeedCurrentAtBat() {
 void Game::changeStatusOfBases(ResultAtBat resultAtBat) {
   int numberOfAdvanceOfBases;
   switch (resultAtBat) {
-  case SINGLE_HIT:
+  case SINGLE:
     numberOfAdvanceOfBases = 1;
     std::cout << "Single Hit" << std::endl;
     break;
-  case TWO_BASE_HIT:
+  case DOUBLE:
     numberOfAdvanceOfBases = 2;
     std::cout << "Two-Base Hit" << std::endl;
     break;
-  case THREE_BASE_HIT:
+  case TRIPLE:
     std::cout << "Three-Base Hit" << std::endl;
     numberOfAdvanceOfBases = 3;
     break;
@@ -141,14 +142,25 @@ void Game::changeStatusOfBases(ResultAtBat resultAtBat) {
         << std::endl; // 四球のときのランナーの進み方に特殊な処理が必要(未実装）
     numberOfAdvanceOfBases = 1;
     break;
+  case HITBYPITCH:
+    std::cout << "Hit By Pitch" << std::endl;
+    numberOfAdvanceOfBases = 1;
+    break;
   case STRIKEOUT:
     std::cout << "StrikeOut" << std::endl;
     numberOfAdvanceOfBases = 0;
     break;
-  case BATTED_BALL_OUT:
-    std::cout << "Batted_Ball_Out" << std::endl;
+  case GROUNDOUT:
+    std::cout << "GroundOut" << std::endl;
     numberOfAdvanceOfBases = 0;
     break;
+  case FLYOUT:
+    std::cout << "FlyOut" << std::endl;
+    numberOfAdvanceOfBases = 0;
+    break;
+  default:
+    break;
+
   }
   Bases nextStatusOfBases = {false, false, false};
   for (int i = FIRST_BASE; i <= THIRD_BASE;
@@ -173,13 +185,13 @@ void Game::updateScoreByTheResultAtBut(ResultAtBat resultAtBat) {
       0; //帰ってこられる最大のランナーの数
   int NumberOfRunnersComeHomebase = 0; //帰ってくるランナーの数
   switch (resultAtBat) {
-  case SINGLE_HIT:
+  case SINGLE:
     NumberOfRunnersPossibleToComeHomebase = 1;
     break;
-  case TWO_BASE_HIT:
+  case DOUBLE:
     NumberOfRunnersPossibleToComeHomebase = 2;
     break;
-  case THREE_BASE_HIT:
+  case TRIPLE:
     NumberOfRunnersPossibleToComeHomebase = 3;
     break;
   case HOMERUN:
@@ -187,10 +199,12 @@ void Game::updateScoreByTheResultAtBut(ResultAtBat resultAtBat) {
     updateScore(1);
     break;
   case WALK:
+  case HITBYPITCH:
     NumberOfRunnersPossibleToComeHomebase = 1;
     break;
-  case BATTED_BALL_OUT:
   case STRIKEOUT:
+  case GROUNDOUT:
+  case FLYOUT:
     NumberOfRunnersPossibleToComeHomebase = 0;
     break;
   }
@@ -207,7 +221,19 @@ ResultAtBat Game::startAtBat() {
   currentCountOfAtBat.Strike = 0;
   currentCountOfAtBat.Ball = 0;
 
-  return ResultAtBat(rand() % 7);
+  std::array<double, 9> probabilities = {
+    0.2, // HIT
+    0.2, // DOUBLE
+    0.2, // TRIPLE
+    0.2, // HOMERUN
+    0.2, // WALK
+    0.2, // HITBYPITCH
+    0.2, // STRIKEOUT
+    0.2, // GROUNDOUT
+    0.2, // FLYOUT
+  };
+
+  return ResultAtBat(rand() % 9);
 }
 
 void Game::succeedInning() {          //イニングを進める関数

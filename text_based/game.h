@@ -6,20 +6,23 @@
 #include "team.h"
 
 enum ResultAtASingleBall {
-  HIT,
-  STRIKE, 
-  FOUL,
+  STRIKE,
   BALL,
+  HIT, // ヒットではなく、"バットに当たってフェアゾーンに飛んだこと"
+  FOUL,
+  BUNT,
 };
 
 enum ResultAtBat {
-  SINGLE_HIT,
-  TWO_BASE_HIT,
-  THREE_BASE_HIT,
+  SINGLE,
+  DOUBLE, // 二塁打
+  TRIPLE, // 三塁打
   HOMERUN,
-  WALK, //四球
+  WALK, // 四球
+  HITBYPITCH, // 死球
   STRIKEOUT,
-  BATTED_BALL_OUT, //スリーバント失敗
+  GROUNDOUT, // ゴロアウト
+  FLYOUT // フライアウト
 };
 
 enum InningTopOrBottom {

@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <array>
+#include <random>
 
 #include "team.h"
 
@@ -221,19 +222,28 @@ ResultAtBat Game::startAtBat() {
   currentCountOfAtBat.Strike = 0;
   currentCountOfAtBat.Ball = 0;
 
-  std::array<double, 9> probabilities = {
-    0.2, // HIT
-    0.2, // DOUBLE
-    0.2, // TRIPLE
-    0.2, // HOMERUN
-    0.2, // WALK
-    0.2, // HITBYPITCH
-    0.2, // STRIKEOUT
-    0.2, // GROUNDOUT
-    0.2, // FLYOUT
+  std::random_device seedGenerator;
+  std::mt19937 mersenneTwisterEngine(seedGenerator()); // メルセンヌツイスター生成
+
+  std::array<double, 9> probabilitiesOfAtBat = {
+    // 2017年の島本（楽天）の成績に似た何かをとりあえず使用。
+    100.0 / 577, // HIT
+    14.0 / 577, // DOUBLE
+    3.0 / 577, // TRIPLE
+    14.0 / 577, // HOMERUN
+    60.0 / 577, // WALK
+    4.0 / 577, // HITBYPITCH
+    90.0 / 577, // STRIKEOUT
+    146.0 / 577, // GROUNDOUT
+    146.0 / 577, // FLYOUT
   };
 
-  return ResultAtBat(rand() % 9);
+  std::discrete_distribution<std::size_t> discreteDistribution(
+      probabilitiesOfAtBat.begin(),
+      probabilitiesOfAtBat.end()
+  );
+
+  return ResultAtBat(discreteDistribution(mersenneTwisterEngine));
 }
 
 void Game::succeedInning() {          //イニングを進める関数

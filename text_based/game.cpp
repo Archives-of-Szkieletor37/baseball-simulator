@@ -1,39 +1,41 @@
 #include "game.h"
+
+#include <iostream>
+#include <array>
+
 #include "team.h"
 
 Game::Game() {
-  Team1 = new Team;
-  Team2 = new Team;
-  Teams.first = Team1;
-  Teams.second = Team2;
+  Team team1;
+  Team team2;
+  teams[0] = team1;
+  teams[1] = team2;
   currentInningNumber = std::pair<int, InningTopOrBottom>(1, TOP);
-  Score = std::pair<int, int>(0, 0);
-  numberOfCurrentAtBat = 1;
+  score = {0, 0};
+  numberOfCurrentAtBat = {1, 1};
   gameStatus = ONGOING;
 };
 
 Game::~Game() {
-  delete Team1;
-  delete Team2;
 };
 
-std::pair<int, int> Game::startGame() {
+std::array<int, 2> Game::startGame() {
 
-  Teams.first->printTeamName();
+  teams[0].printTeamName();
   std::cout << " vs ";
-  Teams.second->printTeamName();
+  teams[1].printTeamName();
   std::cout << std::endl;
 
   std::cout << "スターティングメンバーを紹介します" << std::endl;
   std::cout << "先攻:";
-  Teams.first->printTeamName();
+  teams[0].printTeamName();
   std::cout << std::endl;
-  Teams.first->printHittersCurrentlyAppeared();
+  teams[0].printHittersCurrentlyAppeared();
 
   std::cout << "後攻:";
-  Teams.second->printTeamName();
+  teams[1].printTeamName();
   std::cout << std::endl;
-  Teams.second->printHittersCurrentlyAppeared();
+  teams[1].printHittersCurrentlyAppeared();
 
   while (gameStatus != END) {
 
@@ -44,107 +46,77 @@ std::pair<int, int> Game::startGame() {
       std::cout << "BOTTOM";
     std::cout << " of the " << currentInningNumber.first << std::endl;
 
-    inning = new Inning;
-    inning->startInning(this);
+    startInning();
     succeedInning();
 
     std::cout << "Change\n" << std::endl;
 
-    delete inning;
   }
-  return Score;
+  return score;
+}
+
+void Game::printScore() {
+
+  std::cout << "Now score is " << score[0] << " - " << score[1]
+            << std::endl;
 }
 
 void Game::updateScore(int scoreToAdd) { //スコアを変える関数
 
   switch (currentInningNumber.second) {
   case TOP:                   //表なら
-    Score.first += scoreToAdd; //先攻にプラスする
+    score[0] += scoreToAdd; //先攻にプラスする
     break;
   case BOTTOM:                 //裏なら
-    Score.second += scoreToAdd; //後攻にプラスする
+    score[1] += scoreToAdd; //後攻にプラスする
+    break;
+  default:
     break;
   }
 }
 
-void Game::printScore() {
+void Game::startInning() {
 
-  std::cout << "Now score is " << Score.first << " - " << Score.second
-            << std::endl;
-}
-
-void Game::succeedInning() {          //イニングを進める関数
-  if (currentInningNumber.first == 9 // 9回で
-      && (currentInningNumber.second == BOTTOM // 9回裏か
-          || (currentInningNumber.second == TOP &&
-              Score.first < Score.second))) { // 9回表終了で後攻がリードなら
-    gameStatus = END;                        // ゲーム終了処理
-  } else {
-    switch (currentInningNumber.second) {
-    case TOP:                                // 表なら
-      currentInningNumber.second = BOTTOM; //裏にする
-      break;
-    case BOTTOM:                          // 裏なら
-      currentInningNumber.first++;      //回をひとつ進める
-      currentInningNumber.second = TOP; //回を表にする
-      break;
-    }
-  }
-}
-
-void Game::succeedCurrentAtBat() { //打順を進める関数
-  if (numberOfCurrentAtBat == 9)            // 9番なら
-    numberOfCurrentAtBat = 1;               // 1番へ
-  else
-    numberOfCurrentAtBat++; //ひとつ進める
-}
-
-Inning::Inning() { //イニングの初期状態
-  Outs = 0;
-  for (int i = FIRST_BASE; i <= THIRD_BASE; i++)
-    currentStatusofBases[i] = false;
-  inningStatus = ONGOING;
-}
-
-Inning::~Inning(){};
-
-void Inning::startInning(Game *game) {
-
+  outs = 0;
   ResultAtBat resultAtBat;
+  teamIdOfOffence = (currentInningNumber.second == TOP) ? 0 : 1;
 
-  while (inningStatus != END) {
-    currentAtBat = new AtBat;
-    resultAtBat = currentAtBat->startAtBat(game, this);
-    applyTheResultAtBat(resultAtBat, game);
-    delete currentAtBat;
+  while (outs != 3) {
+    resultAtBat = startAtBat();
+    applyTheResultAtBat(resultAtBat);
   }
 }
 
-void Inning::succeedOuts() {
-  ++Outs;
-  if (Outs == 3) {
-    inningStatus = END; // 終了処理
-  }
+void Game::succeedOuts() {
+  ++outs;
 }
 
-void Inning::applyTheResultAtBat(ResultAtBat resultAtBat, Game *game) {
+void Game::applyTheResultAtBat(ResultAtBat resultAtBat) {
   switch (resultAtBat) {
   case STRIKEOUT:
   case BATTED_BALL_OUT:
     succeedOuts();
-    break;
+    [[gnu::fallthrough]];
   default:
-    game->succeedCurrentAtBat();
+    succeedCurrentAtBat();
     break;
   }
-  updateScoreByTheResultAtBut(resultAtBat, game);
+  updateScoreByTheResultAtBut(resultAtBat);
   changeStatusOfBases(resultAtBat);
-  game->printScore();
-  std::cout << currentStatusofBases[0] << " " << currentStatusofBases[1] << " "
-            << currentStatusofBases[2] << std::endl;
+  printScore();
+  std::cout << currentStatusofBases.bases[0] << " " << currentStatusofBases.bases[1] << " "
+            << currentStatusofBases.bases[2] << std::endl;
 }
 
-void Inning::changeStatusOfBases(ResultAtBat resultAtBat) {
+void Game::succeedCurrentAtBat() {
+
+ if (numberOfCurrentAtBat[teamIdOfOffence] == 9)            // 9番なら
+    numberOfCurrentAtBat[teamIdOfOffence] = 1;               // 1番へ
+  else
+    ++numberOfCurrentAtBat[teamIdOfOffence];
+}
+
+void Game::changeStatusOfBases(ResultAtBat resultAtBat) {
   int numberOfAdvanceOfBases;
   switch (resultAtBat) {
   case SINGLE_HIT:
@@ -182,21 +154,20 @@ void Inning::changeStatusOfBases(ResultAtBat resultAtBat) {
   for (int i = FIRST_BASE; i <= THIRD_BASE;
        i++) { //既に塁上にいるランナーの処理
     if (i + numberOfAdvanceOfBases >= 3) { //本塁まで進む場合
-      currentStatusofBases[i] = false;           //塁からいなくなる
+      currentStatusofBases.bases[i] = false;           //塁からいなくなる
       continue;
-    } else if (currentStatusofBases[i] == true) //それ以外で、ランナーがいる場合は
-      nextStatusOfBases[i + numberOfAdvanceOfBases] =
-          currentStatusofBases[i]; // numberOfAdvanceOfBases だけ進む
+    } else if (currentStatusofBases.bases[i] == true) //それ以外で、ランナーがいる場合は
+      nextStatusOfBases.bases[i + numberOfAdvanceOfBases] =
+          currentStatusofBases.bases[i]; // numberOfAdvanceOfBases だけ進む
   }
   if (numberOfAdvanceOfBases < 4     //打者の処理
       && numberOfAdvanceOfBases > 0) //ホームラン・アウト以外
-    nextStatusOfBases[numberOfAdvanceOfBases - 1] = true;
+    nextStatusOfBases.bases[numberOfAdvanceOfBases - 1] = true;
   for (int i = FIRST_BASE; i <= THIRD_BASE; i++)
-    this->currentStatusofBases[i] = nextStatusOfBases[i]; //配列コピー
+    this->currentStatusofBases.bases[i] = nextStatusOfBases.bases[i]; //配列コピー
 }
 
-void Inning::updateScoreByTheResultAtBut(ResultAtBat resultAtBat,
-                                            Game *game) {
+void Game::updateScoreByTheResultAtBut(ResultAtBat resultAtBat) {
 
   int NumberOfRunnersPossibleToComeHomebase =
       0; //帰ってこられる最大のランナーの数
@@ -213,7 +184,7 @@ void Inning::updateScoreByTheResultAtBut(ResultAtBat resultAtBat,
     break;
   case HOMERUN:
     NumberOfRunnersPossibleToComeHomebase = 3;
-    game->updateScore(1);
+    updateScore(1);
     break;
   case WALK:
     NumberOfRunnersPossibleToComeHomebase = 1;
@@ -224,20 +195,37 @@ void Inning::updateScoreByTheResultAtBut(ResultAtBat resultAtBat,
     break;
   }
   for (int i = 3; i > 3 - NumberOfRunnersPossibleToComeHomebase; i--) {
-    if (currentStatusofBases[i - 1] == true)
+    if (currentStatusofBases.bases[i - 1] == true)
       NumberOfRunnersComeHomebase++;
   }
   if (NumberOfRunnersComeHomebase > 0)
-    game->updateScore(NumberOfRunnersComeHomebase);
+    updateScore(NumberOfRunnersComeHomebase);
 }
 
-AtBat::AtBat() { //打席の初期状態
-  CurrentCountOfThisAtBat.Strike = 0;
-  CurrentCountOfThisAtBat.Ball = 0;
-}
-AtBat::~AtBat(){};
+ResultAtBat Game::startAtBat() {
 
-ResultAtBat AtBat::startAtBat(Game *game, Inning *inning) {
+  currentCountOfAtBat.Strike = 0;
+  currentCountOfAtBat.Ball = 0;
 
   return ResultAtBat(rand() % 7);
 }
+
+void Game::succeedInning() {          //イニングを進める関数
+  if (currentInningNumber.first == 9 // 9回で
+      && (currentInningNumber.second == BOTTOM // 9回裏か
+          || (currentInningNumber.second == TOP &&
+              score[0] < score[1]))) { // 9回表終了で後攻がリードなら
+    gameStatus = END;                        // ゲーム終了処理
+  } else {
+    switch (currentInningNumber.second) {
+    case TOP:                                // 表なら
+      currentInningNumber.second = BOTTOM; //裏にする
+      break;
+    case BOTTOM:                          // 裏なら
+      currentInningNumber.first++;      //回をひとつ進める
+      currentInningNumber.second = TOP; //回を表にする
+      break;
+    }
+  }
+}
+

@@ -5,19 +5,16 @@
 
 int main() {
 
-  Game *newGame;
+  Game newGame;
 
   srand((unsigned int)time(NULL));
 
-  newGame = new Game;
 
-  std::pair<int, int> finalScore;
-  finalScore = newGame->startGame();
+  std::array<int, 2> finalScore;
+  finalScore = newGame.startGame();
 
   std::cout << "The final score is\n"
-            << finalScore.first << " - " << finalScore.second << std::endl;
-
-  delete newGame;
+            << finalScore[0] << " - " << finalScore[1] << std::endl;
 
   return 0;
 }

@@ -1,17 +1,18 @@
 #ifndef _GAME_H_
 #define _GAME_H_
 
-#include <bits/stdc++.h>
+#include <array>
+
 #include "team.h"
 
-enum ResultAtASingleBall{
+enum ResultAtASingleBall {
   HIT,
   STRIKE, 
   FOUL,
   BALL,
 };
 
-enum ResultAtBat{
+enum ResultAtBat {
   SINGLE_HIT,
   TWO_BASE_HIT,
   THREE_BASE_HIT,
@@ -21,19 +22,18 @@ enum ResultAtBat{
   BATTED_BALL_OUT, //スリーバント失敗
 };
 
-enum InningTopOrBottom{
+enum InningTopOrBottom {
   TOP, //表
   BOTTOM, //裏
 };
 
-enum GameStatus{
+enum GameStatus {
   ONGOING,
   END,
 };
 
 struct Bases {
-  bool& operator[](int i) {return bases[i];}
-  bool bases[3];
+  std::array<bool, 3> bases;
 };
 
 constexpr int FIRST_BASE = 0;
@@ -45,60 +45,35 @@ struct Count {
   int Ball;
 };
 
-class Inning;
-class AtBat;
-
-class Game{
+class Game {
   private:
-    Team *Team1,*Team2;
-    std::pair<Team*, Team*> Teams;
+    Team Team1,Team2;
+    std::array<Team, 2> teams;
     std::pair<int, InningTopOrBottom> currentInningNumber;
-    std::pair<int,int> Score;
-    int numberOfCurrentAtBat; // 現在打席の打順
+    std::array<int, 2> score;
+    int teamIdOfOffence;
+    int outs;
+    Count currentCountOfAtBat;
+    std::array<int, 2> numberOfCurrentAtBat; // 現在打席の打順
+    Bases currentStatusofBases;
     GameStatus gameStatus; //true->試合中、false->終了
-    Inning *inning;
 
   public:
     Game();
     ~Game();
-
-    void updateScore(int);
     void printScore();
-    std::pair<int,int> startGame();
-    void succeedInning();
-    void succeedCurrentAtBat();
-};
+    std::array<int,2> startGame();
 
-class Inning{
   private:
-    int Outs;
-    Bases currentStatusofBases;
-    GameStatus inningStatus;
-    AtBat *currentAtBat;
-
-  public:
-    Inning();
-    ~Inning();
-
-    void startInning(Game*);
+    void startInning();
+    void applyTheResultAtBat(ResultAtBat);
     void succeedOuts();
-    void applyTheResultAtBat(ResultAtBat, Game*);
-
-  private:
     void changeStatusOfBases(ResultAtBat);
-    void updateScoreByTheResultAtBut(ResultAtBat, Game*);
-};
-
-class AtBat{
-  private:
-    Count CurrentCountOfThisAtBat;
-    //ResultAtBat eval();
-
-  public:
-    AtBat();
-    ~AtBat();
-
-    ResultAtBat startAtBat(Game*, Inning*);
+    void updateScoreByTheResultAtBut(ResultAtBat);
+    void updateScore(int);
+    void succeedInning();
+    ResultAtBat startAtBat();
+    void succeedCurrentAtBat();
 };
 
 #endif

@@ -5,7 +5,6 @@
 #include <array>
 
 #include "player.h"
-#include "database_player_name.h"
 /*
  * ベンチ入りメンバーを実装する。
  * ベンチメンバーは可変だけど今回は25人にしておく。

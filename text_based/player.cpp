@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "database_player_name.h"
+
 Player::Player() {
   thisPlayerName.firstName = rand() % 2022 + 1; // database[0]がダミーのため
   thisPlayerName.lastName = rand() % 433 + 1;   //同上

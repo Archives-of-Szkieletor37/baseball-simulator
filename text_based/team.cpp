@@ -3,9 +3,6 @@
 #include <iostream>
 #include <math.h>
 
-#include "database_player_name.h"
-#include "game.h"
-
 Team::Team() {
 
   for (int i = 0; i < NUM_OF_PLAYERS_ON_THE_BENCH; ++i) {

@@ -1,6 +1,5 @@
 #include <iostream>
 
-#include "database_player_name.h"
 #include "game.h"
 
 int main() {

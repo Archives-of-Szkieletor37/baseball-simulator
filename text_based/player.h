@@ -3,8 +3,6 @@
 
 #include <string>
 
-#include "database_player_name.h"
-
 using Flag = bool;
 
 struct PlayerName {

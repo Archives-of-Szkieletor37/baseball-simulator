@@ -58,7 +58,7 @@ class Game {
     int outs;
     Count currentCountOfAtBat;
     std::array<int, 2> numberOfCurrentAtBat; // 現在打席の打順
-    Bases currentStatusofBases;
+    Bases currentStatusOfBases;
     GameStatus gameStatus; //true->試合中、false->終了
 
   public:

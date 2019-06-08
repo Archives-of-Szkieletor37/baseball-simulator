@@ -78,6 +78,9 @@ void Game::updateScore(int scoreToAdd) { //スコアを変える関数
 
 void Game::startInning() {
 
+  for (int i = 0; i < 3; ++i) {
+    currentStatusOfBases.bases[i] = false;
+  }
   outs = 0;
   ResultAtBat resultAtBat;
   teamIdOfOffence = (currentInningNumber.second == TOP) ? 0 : 1;
@@ -106,8 +109,8 @@ void Game::applyTheResultAtBat(ResultAtBat resultAtBat) {
   updateScoreByTheResultAtBut(resultAtBat);
   changeStatusOfBases(resultAtBat);
   printScore();
-  std::cout << currentStatusofBases.bases[0] << " " << currentStatusofBases.bases[1] << " "
-            << currentStatusofBases.bases[2] << std::endl;
+  std::cout << currentStatusOfBases.bases[0] << " " << currentStatusOfBases.bases[1] << " "
+            << currentStatusOfBases.bases[2] << std::endl;
 }
 
 void Game::succeedCurrentAtBat() {
@@ -167,17 +170,17 @@ void Game::changeStatusOfBases(ResultAtBat resultAtBat) {
   for (int i = FIRST_BASE; i <= THIRD_BASE;
        i++) { //既に塁上にいるランナーの処理
     if (i + numberOfAdvanceOfBases >= 3) { //本塁まで進む場合
-      currentStatusofBases.bases[i] = false;           //塁からいなくなる
+      currentStatusOfBases.bases[i] = false;           //塁からいなくなる
       continue;
-    } else if (currentStatusofBases.bases[i] == true) //それ以外で、ランナーがいる場合は
+    } else if (currentStatusOfBases.bases[i] == true) //それ以外で、ランナーがいる場合は
       nextStatusOfBases.bases[i + numberOfAdvanceOfBases] =
-          currentStatusofBases.bases[i]; // numberOfAdvanceOfBases だけ進む
+          currentStatusOfBases.bases[i]; // numberOfAdvanceOfBases だけ進む
   }
   if (numberOfAdvanceOfBases < 4     //打者の処理
       && numberOfAdvanceOfBases > 0) //ホームラン・アウト以外
     nextStatusOfBases.bases[numberOfAdvanceOfBases - 1] = true;
   for (int i = FIRST_BASE; i <= THIRD_BASE; i++)
-    this->currentStatusofBases.bases[i] = nextStatusOfBases.bases[i]; //配列コピー
+    this->currentStatusOfBases.bases[i] = nextStatusOfBases.bases[i]; //配列コピー
 }
 
 void Game::updateScoreByTheResultAtBut(ResultAtBat resultAtBat) {
@@ -210,7 +213,7 @@ void Game::updateScoreByTheResultAtBut(ResultAtBat resultAtBat) {
     break;
   }
   for (int i = 3; i > 3 - NumberOfRunnersPossibleToComeHomebase; i--) {
-    if (currentStatusofBases.bases[i - 1] == true)
+    if (currentStatusOfBases.bases[i - 1] == true)
       NumberOfRunnersComeHomebase++;
   }
   if (NumberOfRunnersComeHomebase > 0)
